@@ -1,4 +1,4 @@
-package com.elevateresume.resume_service.document;
+package com.elevateresume.resume_service.entity;
 
 public enum ResumeTemplate {
     ORIGINAL,
