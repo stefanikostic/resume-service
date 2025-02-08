@@ -2,7 +2,7 @@ package com.elevateresume.resume_service.service;
 
 import com.elevateresume.resume_service.config.S3ConfigurationProperties;
 import com.elevateresume.resume_service.dto.ResumeUploadDataDTO;
-import com.elevateresume.resume_service.exceptions.S3ObjectNotFoundException;
+import com.elevateresume.resume_service.exception.S3ObjectNotFoundException;
 import com.elevateresume.resume_service.service.interfaces.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
