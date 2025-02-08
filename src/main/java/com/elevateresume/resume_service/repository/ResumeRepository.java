@@ -1,14 +1,14 @@
 package com.elevateresume.resume_service.repository;
 
-import com.elevateresume.resume_service.document.ResumeDocument;
-import com.elevateresume.resume_service.dto.Resume;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import com.elevateresume.resume_service.entity.Resume;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ResumeRepository extends ReactiveMongoRepository<ResumeDocument,String> {
+import java.util.List;
+import java.util.Optional;
 
-    Mono<Resume> findByUserId(String userId);
+public interface ResumeRepository extends JpaRepository<Resume, String> {
 
-    Flux<Resume> findByTemplate(String template);
+    Optional<Resume> findByUserId(String userId);
+
+    List<Resume> findByTemplate(String template);
 }
