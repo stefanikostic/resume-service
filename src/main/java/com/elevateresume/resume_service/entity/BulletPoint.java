@@ -20,8 +20,8 @@ import lombok.Setter;
 public class BulletPoint {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     private String title;
 
@@ -34,7 +34,7 @@ public class BulletPoint {
     private String improvedContent;
 
     @Column(name = "is_improvement_approved", nullable = false)
-    private Boolean isImprovementApproved = false;
+    private boolean isImprovementApproved = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id", nullable = false)
