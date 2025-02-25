@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtDataExtractor {
 
+    private static final String USER_ID = "userId";
     private final JwtConfigurationProperties jwtConfigurationProperties;
 
     private Claims extractClaims(String token) {
@@ -23,6 +24,6 @@ public class JwtDataExtractor {
     }
 
     public String extractUserId(String token) {
-        return extractClaims(token).get("userId", String.class);
+        return extractClaims(token).get(USER_ID, String.class);
     }
 }
