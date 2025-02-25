@@ -1,9 +1,10 @@
 package com.elevateresume.resume_service.controller;
 
 import com.elevateresume.resume_service.dto.ResumeUploadDataDTO;
-import com.elevateresume.resume_service.entity.Resume;
+import com.elevateresume.resume_service.redis.model.ResumeDTO;
 import com.elevateresume.resume_service.service.interfaces.ResumeService;
 import com.elevateresume.resume_service.service.interfaces.StorageService;
+import com.elevateresume.resume_service.util.RequestContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,32 +15,33 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/resume")
+@RequestMapping("/internal/resume")
 @RequiredArgsConstructor
-public class ResumeController {
+public class ResumeExternalController {
 
     private final ResumeService resumeService;
     private final StorageService storageService;
+    private final RequestContext requestContext;
 
-    @GetMapping("/user")
-    public ResponseEntity<Resume> getResumeByUserId() throws IOException {
-        Optional<Resume> resumeOptional = resumeService.getResumeByUserId();
-        if (resumeOptional.isEmpty()) {
+    @GetMapping("/")
+    public ResponseEntity<ResumeDTO> getResumeByUserId() {
+        String userId = requestContext.getUserId();
+        ResumeDTO resumeDTO = resumeService.getResumeByUserId(userId);
+        if (resumeDTO == null) {
             return ResponseEntity.notFound().build();
         }
-        Resume resume = resumeOptional.get();
-        String s3FileName = resume.getS3FileName();
-        String content = storageService.getLatestVersionOfResume(s3FileName);
-        return ResponseEntity.ok(resume);
+
+        return ResponseEntity.ok(resumeDTO);
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadResume(@RequestParam("resume") MultipartFile file) throws IOException {
+    public ResponseEntity<String> upload(@RequestParam("resume") MultipartFile file) throws IOException {
         ResumeUploadDataDTO resumeUploadDataDTO = storageService.uploadFile(file);
 
+        // call resume processor to process and extract resume
+        // save in db and cache
         resumeService.createResume(resumeUploadDataDTO, file);
 
         return ResponseEntity.ok("Resume uploaded successfully: " + resumeUploadDataDTO);
