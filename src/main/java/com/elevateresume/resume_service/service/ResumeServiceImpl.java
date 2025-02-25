@@ -7,7 +7,7 @@ import com.elevateresume.resume_service.dto.SectionInsertDTO;
 import com.elevateresume.resume_service.entity.BulletPoint;
 import com.elevateresume.resume_service.entity.Resume;
 import com.elevateresume.resume_service.entity.Section;
-import com.elevateresume.resume_service.redis.model.ResumeRedisModel;
+import com.elevateresume.resume_service.redis.model.ResumeDTO;
 import com.elevateresume.resume_service.repository.redis.ResumeRedisRepository;
 import com.elevateresume.resume_service.repository.jpa.ResumeJpaRepository;
 import com.elevateresume.resume_service.service.interfaces.ResumeService;
@@ -35,9 +35,9 @@ public class ResumeServiceImpl implements ResumeService {
     private final ResumeMapper resumeMapper;
 
     @Override
-    public ResumeRedisModel getResumeByUserId(String userId) {
+    public ResumeDTO getResumeByUserId(String userId) {
         log.info("Started get resume.");
-        Optional<ResumeRedisModel> resumeRedisModel = resumeRedisRepository.findByUserId(userId);
+        Optional<ResumeDTO> resumeRedisModel = resumeRedisRepository.findByUserId(userId);
         if (resumeRedisModel.isPresent()) {
             log.debug("Resume fetched from cache.");
             return resumeRedisModel.get();
@@ -49,7 +49,7 @@ public class ResumeServiceImpl implements ResumeService {
 
     @Override
     @Transactional
-    public ResumeRedisModel getResumeFromDb(String userId) {
+    public ResumeDTO getResumeFromDb(String userId) {
         Optional<Resume> resume = resumeJpaRepository.findByUserId(userId);
         return resume.map(resumeMapper::toResumeRedisModel).orElse(null);
     }
@@ -67,7 +67,7 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
-    public ResumeRedisModel createResume(ResumeUploadDataDTO resumeUploadDataDTO, MultipartFile file) {
+    public ResumeDTO createResume(ResumeUploadDataDTO resumeUploadDataDTO, MultipartFile file) {
         ResumeInsertDTO resumeInsertDTO = resumeProcessor.processResume();
         Resume resume = new Resume();
 
@@ -89,10 +89,10 @@ public class ResumeServiceImpl implements ResumeService {
         Resume savedResume = save(resume);
         log.debug("Resume persisted in DB.");
 
-        ResumeRedisModel resumeRedisModel = resumeMapper.toResumeRedisModel(savedResume);
-        resumeRedisRepository.save(resumeRedisModel);
+        ResumeDTO resumeDTO = resumeMapper.toResumeRedisModel(savedResume);
+        resumeRedisRepository.save(resumeDTO);
         log.debug("Resume persisted in cache.");
-        return resumeRedisModel;
+        return resumeDTO;
     }
 
 
