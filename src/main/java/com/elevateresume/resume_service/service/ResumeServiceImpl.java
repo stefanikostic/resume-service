@@ -7,9 +7,10 @@ import com.elevateresume.resume_service.dto.SectionInsertDTO;
 import com.elevateresume.resume_service.entity.BulletPoint;
 import com.elevateresume.resume_service.entity.Resume;
 import com.elevateresume.resume_service.entity.Section;
+import com.elevateresume.resume_service.mapper.ResumeMapper;
 import com.elevateresume.resume_service.redis.model.ResumeDTO;
-import com.elevateresume.resume_service.repository.redis.ResumeRedisRepository;
 import com.elevateresume.resume_service.repository.jpa.ResumeJpaRepository;
+import com.elevateresume.resume_service.repository.redis.ResumeRedisRepository;
 import com.elevateresume.resume_service.service.interfaces.ResumeService;
 import com.elevateresume.resume_service.util.RequestContext;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class ResumeServiceImpl implements ResumeService {
     @Transactional
     public ResumeDTO getResumeFromDb(String userId) {
         Optional<Resume> resume = resumeJpaRepository.findByUserId(userId);
-        return resume.map(resumeMapper::toResumeRedisModel).orElse(null);
+        return resume.map(resumeMapper::toResumeDTO).orElse(null);
     }
 
     @Override
@@ -69,32 +70,22 @@ public class ResumeServiceImpl implements ResumeService {
     @Override
     public ResumeDTO createResume(ResumeUploadDataDTO resumeUploadDataDTO, MultipartFile file) {
         ResumeInsertDTO resumeInsertDTO = resumeProcessor.processResume();
-        Resume resume = new Resume();
+        Resume resume = resumeMapper.toResume(resumeInsertDTO);
 
         resume.setFileName(file.getOriginalFilename());
         resume.setS3Link(resumeUploadDataDTO.fileUrl());
         resume.setS3FileName(resumeUploadDataDTO.fileName());
-
         resume.setCreatedAt(LocalDateTime.now());
-        resume.setTitle(resumeInsertDTO.title());
-        if (resumeInsertDTO.sections() != null) {
-            for (SectionInsertDTO sectionInsertDTO : resumeInsertDTO.sections()) {
-                Section section = buildSection(sectionInsertDTO);
-
-                resume.addSection(section);
-            }
-        }
         resume.setUserId(requestContext.getUserId());
 
         Resume savedResume = save(resume);
         log.debug("Resume persisted in DB.");
 
-        ResumeDTO resumeDTO = resumeMapper.toResumeRedisModel(savedResume);
+        ResumeDTO resumeDTO = resumeMapper.toResumeDTO(savedResume);
         resumeRedisRepository.save(resumeDTO);
         log.debug("Resume persisted in cache.");
         return resumeDTO;
     }
-
 
     private Resume save(Resume resume) {
         return resumeJpaRepository.save(resume);
