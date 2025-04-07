@@ -7,5 +7,4 @@ import java.io.IOException;
 
 public interface StorageService {
     ResumeUploadDataDTO uploadFile(MultipartFile file) throws IOException;
-    String getLatestVersionOfResume(String objectKey) throws IOException;
 }
