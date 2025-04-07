@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/internal/resume")
+@RequestMapping("/external/resume")
 @RequiredArgsConstructor
 public class ResumeExternalController {
 
