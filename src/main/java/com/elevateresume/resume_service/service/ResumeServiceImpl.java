@@ -43,8 +43,8 @@ public class ResumeServiceImpl implements ResumeService {
             log.debug("Resume fetched from cache.");
             return resumeRedisModel.get();
         }
-        log.debug("Resume fetched from DB.");
 
+        log.debug("Resume fetched from DB.");
         return getResumeFromDb(userId);
     }
 
@@ -61,6 +61,7 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
+    @Transactional
     public Resume createResume(ResumeInsertDTO resumeInsertDTO) {
         Resume resume = new Resume();
 
@@ -68,6 +69,7 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
+    @Transactional
     public ResumeDTO createResume(ResumeUploadDataDTO resumeUploadDataDTO, MultipartFile file) {
         ResumeInsertDTO resumeInsertDTO = resumeProcessor.processResume();
         Resume resume = resumeMapper.toResume(resumeInsertDTO);
@@ -84,6 +86,7 @@ public class ResumeServiceImpl implements ResumeService {
         ResumeDTO resumeDTO = resumeMapper.toResumeDTO(savedResume);
         resumeRedisRepository.save(resumeDTO);
         log.debug("Resume persisted in cache.");
+
         return resumeDTO;
     }
 
