@@ -1,12 +1,8 @@
 package com.elevateresume.resume_service.service;
 
-import com.elevateresume.resume_service.dto.BulletPointInsertDTO;
 import com.elevateresume.resume_service.dto.ResumeInsertDTO;
 import com.elevateresume.resume_service.dto.ResumeUploadDataDTO;
-import com.elevateresume.resume_service.dto.SectionInsertDTO;
-import com.elevateresume.resume_service.entity.BulletPoint;
 import com.elevateresume.resume_service.entity.Resume;
-import com.elevateresume.resume_service.entity.Section;
 import com.elevateresume.resume_service.mapper.ResumeMapper;
 import com.elevateresume.resume_service.redis.model.ResumeDTO;
 import com.elevateresume.resume_service.repository.jpa.ResumeJpaRepository;
@@ -20,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,26 +87,5 @@ public class ResumeServiceImpl implements ResumeService {
 
     private Resume save(Resume resume) {
         return resumeJpaRepository.save(resume);
-    }
-
-    private static Section buildSection(SectionInsertDTO sectionInsertDTO) {
-        Section section = new Section();
-        section.setTitle(sectionInsertDTO.title());
-        section.setContent(sectionInsertDTO.content());
-        section.setStartPeriod(sectionInsertDTO.startPeriod());
-        section.setEndPeriod(sectionInsertDTO.endPeriod());
-        section.setType(sectionInsertDTO.sectionType());
-        List<BulletPoint> bulletPoints = new ArrayList<>();
-        if (sectionInsertDTO.bulletPoints() != null) {
-            for (BulletPointInsertDTO bulletPointInsertDTO : sectionInsertDTO.bulletPoints()) {
-                BulletPoint bulletPoint = new BulletPoint();
-                bulletPoint.setTitle(bulletPointInsertDTO.title());
-                bulletPoint.setSection(section);
-                bulletPoint.setContent(bulletPointInsertDTO.content());
-                bulletPoints.add(bulletPoint);
-            }
-        }
-        section.setBulletPoints(bulletPoints);
-        return section;
     }
 }
