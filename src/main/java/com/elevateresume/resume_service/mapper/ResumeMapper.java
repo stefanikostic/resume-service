@@ -20,18 +20,18 @@ public interface ResumeMapper {
 
     @Mapping(target = "resume", ignore = true)
     Section toSection(SectionInsertDTO request);
-
-    default Resume mapResumeWithSections(ResumeInsertDTO resumeInsertDTO) {
-        Resume resume = toResume(resumeInsertDTO);
-        resume.setSections(
-                resumeInsertDTO.sections().stream()
-                        .map(sectionRequest -> {
-                            Section section = toSection(sectionRequest);
-                            section.setResume(resume);
-                            return section;
-                        })
-                        .collect(Collectors.toList())
-        );
-        return resume;
-    }
+//
+//    default Resume mapResumeWithSections(ResumeInsertDTO resumeInsertDTO) {
+//        Resume resume = toResume(resumeInsertDTO);
+//        resume.setSections(
+//                resumeInsertDTO.sections().stream()
+//                        .map(sectionRequest -> {
+//                            Section section = toSection(sectionRequest);
+//                            section.setResume(resume);
+//                            return section;
+//                        })
+//                        .collect(Collectors.toList())
+//        );
+//        return resume;
+//    }
 }
